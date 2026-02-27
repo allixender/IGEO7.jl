@@ -7,7 +7,7 @@ export Z7IndexUInt64, get_base_cell, get_digits, get_digit, get_resolution, get_
 export get_base_cell_neighbour, get_base_cell_neighbours, get_neighbours
 
 # convenience functions for resolution lookup based on target metrics
-export find_resolution_by_cls_m, find_resolution_by_area_m2, find_resolution_by_num_cells, get_resolution_stats, RESOLUTION_STATS, get_num_cells, get_cell_area_m2, get_cell_area_km2, get_cls_m, get_cls_km
+export find_resolution_by_cls_m, find_resolution_by_area_m2, find_resolution_by_num_cells, get_resolution_stats, RESOLUTION_STATS, find_resolution_by_value, get_num_cells, get_cell_area_m2, get_cell_area_km2, get_cls_m, get_cls_km
 export get_z7hex_resolution, get_z7hex_local_pos, get_z7string_resolution, get_z7string_local_pos, decode_z7hex_index, encode_z7hex_index, z7hex_to_z7string, z7hex_to_z7int, z7int_to_z7hex, decode_z7int, encode_z7int
 
 # some experimental functions
