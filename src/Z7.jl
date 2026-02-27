@@ -3,7 +3,7 @@ module Z7
 using StaticArrays
 
 # more import intended use functions, e.g. sort of core API
-export Z7IndexUInt64, get_base_cell, get_digits, get_digit, get_resolution, get_parent
+export Z7IndexUInt64, get_base_cell, get_digits, get_digit, get_resolution, get_parent, index_to_z7string, z7string_to_index
 export get_base_cell_neighbour, get_base_cell_neighbours, get_neighbours
 
 # convenience functions for resolution lookup based on target metrics
