@@ -512,68 +512,68 @@ end
     @testset "first_non_zero with Z7IndexUInt64" begin
         # Test from C++ tests: first_non_zero("0000000"_Z7) == 6
         idx1 = z7string_to_index("0000000")
-        @test first_non_zero(idx1) == 6
-        
+        @test Z7.first_non_zero(idx1) == 6
+
         # Test: first_non_zero("1000000"_Z7) == 6
         idx2 = z7string_to_index("1000000")
-        @test first_non_zero(idx2) == 6
-        
+        @test Z7.first_non_zero(idx2) == 6
+
         # Test: first_non_zero("1234000"_Z7) == 1
         idx3 = z7string_to_index("1234000")
-        @test first_non_zero(idx3) == 1
-        
+        @test Z7.first_non_zero(idx3) == 1
+
         # Test: first_non_zero("1200567"_Z7) == 3
         idx4 = z7string_to_index("1200567")
-        @test first_non_zero(idx4) == 3
-        
+        @test Z7.first_non_zero(idx4) == 3
+
         # Test: first_non_zero("1277777"_Z7) == 0 (all digits are 7)
         idx5 = z7string_to_index("12")
-        @test first_non_zero(idx5) == 0
+        @test Z7.first_non_zero(idx5) == 0
     end
-    
+
     @testset "first_non_zero with Z7IndexComp" begin
         # Test same cases with Z7IndexComp
         idx1 = Z7IndexComp(z7string_to_index("0000000").raw)
-        @test first_non_zero(idx1) == 6
-        
+        @test Z7.first_non_zero(idx1) == 6
+
         idx2 = Z7IndexComp(z7string_to_index("1234000").raw)
-        @test first_non_zero(idx2) == 1
-        
+        @test Z7.first_non_zero(idx2) == 1
+
         idx3 = Z7IndexComp(z7string_to_index("1200567").raw)
-        @test first_non_zero(idx3) == 3
+        @test Z7.first_non_zero(idx3) == 3
     end
 end
 
 @testset "GBT Neighbour Addition Functions" begin
     @testset "neighbour_addition_cw" begin
         # 0 + 0 = (0, 0)
-        @test neighbour_addition_cw(UInt8(0), UInt8(0)) == (0, 0)
+        @test Z7.neighbour_addition_cw(UInt8(0), UInt8(0)) == (0, 0)
         # 0 + 1 = (0, 1)
-        @test neighbour_addition_cw(UInt8(0), UInt8(1)) == (0, 1)
+        @test Z7.neighbour_addition_cw(UInt8(0), UInt8(1)) == (0, 1)
         # 1 + 1 = (1, 4)
-        @test neighbour_addition_cw(UInt8(1), UInt8(1)) == (1, 4)
+        @test Z7.neighbour_addition_cw(UInt8(1), UInt8(1)) == (1, 4)
         # 1 + 2 = (0, 3)
-        @test neighbour_addition_cw(UInt8(1), UInt8(2)) == (0, 3)
+        @test Z7.neighbour_addition_cw(UInt8(1), UInt8(2)) == (0, 3)
     end
 
     @testset "neighbour_addition_ccw" begin
         # 0 + 0 = (0, 0)
-        @test neighbour_addition_ccw(UInt8(0), UInt8(0)) == (0, 0)
+        @test Z7.neighbour_addition_ccw(UInt8(0), UInt8(0)) == (0, 0)
         # 0 + 1 = (0, 1)
-        @test neighbour_addition_ccw(UInt8(0), UInt8(1)) == (0, 1)
+        @test Z7.neighbour_addition_ccw(UInt8(0), UInt8(1)) == (0, 1)
         # 1 + 1 = (1, 2)
-        @test neighbour_addition_ccw(UInt8(1), UInt8(1)) == (1, 2)
+        @test Z7.neighbour_addition_ccw(UInt8(1), UInt8(1)) == (1, 2)
         # 1 + 2 = (0, 3)
-        @test neighbour_addition_ccw(UInt8(1), UInt8(2)) == (0, 3)
+        @test Z7.neighbour_addition_ccw(UInt8(1), UInt8(2)) == (0, 3)
     end
 
     @testset "neighbour_addition_ccw_mod" begin
         # 0 + 0 = (0, 0)
-        @test neighbour_addition_ccw_mod(UInt8(0), UInt8(0)) == (0, 0)
+        @test Z7.neighbour_addition_ccw_mod(UInt8(0), UInt8(0)) == (0, 0)
         # 1 + 1 = (1, 2)
-        @test neighbour_addition_ccw_mod(UInt8(1), UInt8(1)) == (1, 2)
+        @test Z7.neighbour_addition_ccw_mod(UInt8(1), UInt8(1)) == (1, 2)
         # 6 + 1 = (0, 0)  - mod 7(6+1) = 0
-        @test neighbour_addition_ccw_mod(UInt8(6), UInt8(1)) == (0, 0)
+        @test Z7.neighbour_addition_ccw_mod(UInt8(6), UInt8(1)) == (0, 0)
     end
 end
 
