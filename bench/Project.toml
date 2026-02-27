@@ -1,0 +1,8 @@
+name = "Z7Benchmarks"
+
+[deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+Z7 = "7876a7e4-f18e-4011-b78c-c34637eda695"
+
+[compat]
+BenchmarkTools = "1"
