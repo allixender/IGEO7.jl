@@ -1,4 +1,4 @@
-module Z7
+module IGEO7
 
 using StaticArrays
 
@@ -48,12 +48,48 @@ function get_resolution_stats(resolution::Int)
 	return RESOLUTION_STATS[resolution]
 end
 
+"""
+    get_num_cells(resolution::Int)
+
+Get the total number of cells in the IGEO7 grid at a given resolution.
+"""
 get_num_cells(resolution::Int) = get_resolution_stats(resolution).num_cells
+
+"""
+    get_cell_area_m2(resolution::Int)
+
+Get the average cell area in square meters (m²) at a given resolution.
+"""
 get_cell_area_m2(resolution::Int) = get_resolution_stats(resolution).area_m2
+
+"""
+    get_cell_area_km2(resolution::Int)
+
+Get the average cell area in square kilometers (km²) at a given resolution.
+"""
 get_cell_area_km2(resolution::Int) = get_resolution_stats(resolution).area_km2
+
+"""
+    get_cls_m(resolution::Int)
+
+Get the characteristic length scale (CLS) in meters (m) at a given resolution.
+"""
 get_cls_m(resolution::Int) = get_resolution_stats(resolution).cls_m
+
+"""
+    get_cls_km(resolution::Int)
+
+Get the characteristic length scale (CLS) in kilometers (km) at a given resolution.
+"""
 get_cls_km(resolution::Int) = get_resolution_stats(resolution).cls_km
 
+"""
+    find_resolution_by_value(target::Real, metric::Symbol; prefer::Symbol=:closest)
+
+Find the grid resolution (0-20) that best matches a target value for a specific metric.
+Metrics include `:num_cells`, `:area_km2`, `:area_m2`, `:cls_km`, and `:cls_m`.
+Strategy `prefer` can be `:closest`, `:larger`, or `:smaller`.
+"""
 function find_resolution_by_value(target::Real, metric::Symbol; prefer::Symbol=:closest)
     # Validate metric
     valid_metrics = (:num_cells, :area_km2, :area_m2, :cls_km, :cls_m)
@@ -100,14 +136,29 @@ function find_resolution_by_value(target::Real, metric::Symbol; prefer::Symbol=:
     return best_res
 end
 
+"""
+    find_resolution_by_cls_m(target_m::Real; prefer::Symbol=:closest)
+
+Find the best resolution matching a target characteristic length scale in meters.
+"""
 function find_resolution_by_cls_m(target_m::Real; prefer::Symbol=:closest)
     return find_resolution_by_value(target_m, :cls_m, prefer=prefer)
 end
 
+"""
+    find_resolution_by_area_m2(target_m2::Real; prefer::Symbol=:closest)
+
+Find the best resolution matching a target cell area in square meters.
+"""
 function find_resolution_by_area_m2(target_m2::Real; prefer::Symbol=:closest)
     return find_resolution_by_value(target_m2, :area_m2, prefer=prefer)
 end
 
+"""
+    find_resolution_by_num_cells(target_cells::Integer; prefer::Symbol=:closest)
+
+Find the best resolution matching a target number of cells.
+"""
 function find_resolution_by_num_cells(target_cells::Integer; prefer::Symbol=:closest)
     return find_resolution_by_value(target_cells, :num_cells, prefer=prefer)
 end
@@ -301,23 +352,59 @@ end
 # readability, usability vs speed trade-offs
 
 # Store only UInt64, extract digits via bit manipulation
+"""
+    Z7IndexUInt64(raw::UInt64)
+
+A Z7 cell index representation that stores only the raw `UInt64` value.
+Digits are extracted on-the-fly using bit manipulation.
+"""
 struct Z7IndexUInt64
     raw::UInt64
 end
 
+"""
+    Z7IndexComp(raw::UInt64)
+
+A Z7 cell index representation that decodes and stores its digits in an `SVector` upon construction.
+Faster for multiple digit accesses at the cost of higher construction time and memory.
+"""
+struct Z7IndexComp
+    raw::UInt64
+    base_cell::UInt8
+    digits::SVector{20, UInt8}  # StaticArrays for stack allocation
+end
+
+"""
+    get_base_cell(idx)
+
+Get the base cell ID (0-11) of the given Z7 index.
+"""
 @inline get_base_cell(idx::Z7IndexUInt64) = UInt8((idx.raw >> 60) & 0x0F)
 
-# Very fast bit extraction (2-3 CPU cycles)
+"""
+    get_digit(idx, i::Int)
+
+Get the digit at resolution `i` (1-indexed). Digits are 0-6, or 7 if beyond resolution.
+"""
 @inline function get_digit(idx::Z7IndexUInt64, i::Int)
     shift = 57 - 3 * (i - 1)  # i is 1-indexed
     return UInt8((idx.raw >> shift) & 0x07)
 end
 
-# For multiple digit access, decode to tuple
+"""
+    get_digits(idx)
+
+Get all 20 resolution digits of the index as a tuple.
+"""
 @inline function get_digits(idx::Z7IndexUInt64)
     ntuple(i -> get_digit(idx, i), Val(20))
 end
 
+"""
+    get_resolution(idx)
+
+Get the grid resolution level of the cell (0-20).
+"""
 function get_resolution(idx::Z7IndexUInt64)
     for i in 1:20
         get_digit(idx, i) == 7 && return i - 1
@@ -325,6 +412,11 @@ function get_resolution(idx::Z7IndexUInt64)
     return 20
 end
 
+"""
+    get_parent(idx, [resolution])
+
+Get the parent cell of the given index at the specified resolution (defaults to current resolution - 1).
+"""
 function get_parent(idx::Z7IndexUInt64, resolution::Int)
     resolution = clamp(resolution, 0, 20)
     
@@ -348,17 +440,14 @@ function get_parent(idx::Z7IndexUInt64, resolution::Int)
     return Z7IndexUInt64(result)
 end
 
+"""
+    get_parent(idx)
+
+Get the parent cell of the given index at the previous resolution.
+"""
 function get_parent(idx::Z7IndexUInt64)
     res = get_resolution(idx)
     return res > 0 ? get_parent(idx, res - 1) : idx
-end
-
-
-# Store as UInt64, but decode once and cache the digits
-struct Z7IndexComp
-    raw::UInt64
-    base_cell::UInt8
-    digits::SVector{20, UInt8}  # StaticArrays for stack allocation
 end
 
 # Decode once on construction
@@ -643,11 +732,10 @@ struct Z7Carry
 end
 
 """
-Compute a single neighbour in direction N (1-6) at a given resolution.
-This is an optimized version for a known direction digit.
+    get_neighbour(ref, direction, resolution)
 
-Returns a Z7Carry struct containing the neighbour index and any carry value.
-If carry != 0, the neighbour crosses a base cell boundary.
+Compute a single neighbor index in one of 6 directions (1-6) at the given resolution level.
+Returns a `Z7Carry` struct which tracks the new index and whether the cell crossed a base cell boundary.
 """
 function get_neighbour(ref::Z7IndexUInt64, direction::UInt8, resolution::Int)
     @assert 1 <= direction <= 6 "Direction must be 1-6"
@@ -697,10 +785,10 @@ function get_neighbour(ref::Z7IndexUInt64, direction::UInt8, resolution::Int)
 end
 
 """
-Compute all 6 neighbours of a cell at its resolution.
+    get_neighbours(ref)
 
-Returns a vector of 6 Z7IndexUInt64 values representing the neighbours.
-For pentagons, one neighbour will be marked as invalid (all bits set).
+Find all 6 immediate neighbors (or 5 for pentagons) of a given cell index.
+Invalid neighbors for pentagonal base cells are marked with a bitmask of `typemax(UInt64)`.
 """
 function get_neighbours(ref::Z7IndexUInt64)
     resolution = get_resolution(ref)

@@ -1,5 +1,5 @@
 using BenchmarkTools
-using Z7
+using IGEO7
 
 # Define benchmark suite
 const SUITE = BenchmarkGroup()

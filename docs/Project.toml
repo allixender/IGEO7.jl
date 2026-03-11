@@ -1,0 +1,10 @@
+name = "IGEO7Docs"
+
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
+IGEO7 = "7876a7e4-f18e-4011-b78c-c34637eda695"
+
+[compat]
+Documenter = "1"
+Literate = "2"

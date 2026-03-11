@@ -1,7 +1,10 @@
-name = "Z7"
+name = "IGEO7"
 uuid = "7876a7e4-f18e-4011-b78c-c34637eda695"
 authors = ["Alexander Kmoch <alexander.kmoch@ut.ee> and contributors"]
-version = "1.0.0-DEV"
+version = "0.2.0"
+
+[workspace]
+projects = ["docs", "bench"]
 
 [deps]
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
