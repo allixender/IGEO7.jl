@@ -1,6 +1,8 @@
 # IGEO7 - Index functions and neighbor traversal in the IGEO7/Z7 DGGS
 
 [![Build Status](https://github.com/allixender/IGEO7.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/allixender/IGEO7.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://allixender.github.io/IGEO7.jl/stable/)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://allixender.github.io/IGEO7.jl/dev/)
 
 This is a work-in-progress to explore the possibility of neighbor traversal in the IGEO7/Z7. Z7 is an indexing system for the IGEO7 aperture 7 hexagonal discrete global grid DGGRID/Sahr Kmoch et al. (2025). It is based on the Generalized Balanced Ternary (GBT) numeral system described in Lucas, Gibson (1982), van Roessel (1988), Sahr (2019), and Wikipedia (2025).
 
